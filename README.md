@@ -2,6 +2,8 @@
 
 A Rust-based AI agent library built with rig-core, featuring streaming responses, multi-turn conversations, shell command execution, and HTTP/WebSocket server for remote access via OpenRouter with Gemini models.
 
+> ⚡ *Human-seeded, AI-cultivated. The foundation was laid by flesh and blood; the architecture grew from artificial minds.*
+
 ## Features
 
 - **Streaming Responses**: Real-time token-by-token output
