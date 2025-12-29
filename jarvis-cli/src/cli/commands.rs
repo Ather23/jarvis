@@ -7,8 +7,17 @@ use std::io::{self, BufRead, IsTerminal, Write};
 #[command(name = "jarvis")]
 #[command(author, version, about = "Jarvis AI Agent CLI", long_about = None)]
 pub struct Cli {
+    /// Enter interactive REPL mode
+    #[arg(short, long)]
+    pub interactive: bool,
+    /// Model to use
+    #[arg(short, long)]
+    pub model: Option<String>,
+    /// Raw output (no decorations, suitable for piping)
+    #[arg(short, long)]
+    pub raw: bool,
     #[command(subcommand)]
-    pub command: Commands,
+    pub command: Option<Commands>,
 }
 
 #[derive(Subcommand)]
@@ -18,37 +27,21 @@ pub enum Commands {
         /// The prompt to send (use "-" or omit to read from stdin)
         #[arg(default_value = "-")]
         prompt: String,
-        /// Model to use
-        #[arg(short, long)]
-        model: Option<String>,
         /// Disable thinking output
         #[arg(long)]
         no_thinking: bool,
-        /// Raw output (no decorations, suitable for piping)
-        #[arg(long, short)]
-        raw: bool,
     },
     /// Non-streaming response
     Run {
         /// The prompt to send (use "-" or omit to read from stdin)
         #[arg(default_value = "-")]
         prompt: String,
-        /// Model to use
-        #[arg(short, long)]
-        model: Option<String>,
         /// Output as JSON
         #[arg(long)]
         json: bool,
-        /// Raw output (no decorations, suitable for piping)
-        #[arg(long, short)]
-        raw: bool,
     },
     /// Interactive REPL mode
-    Interactive {
-        /// Model to use
-        #[arg(short, long)]
-        model: Option<String>,
-    },
+    Interactive,
 }
 
 /// Read prompt from stdin if prompt is "-" or stdin is piped
@@ -82,7 +75,7 @@ pub async fn handle_chat(
     raw: bool,
 ) -> Result<(), anyhow::Error> {
     let prompt = read_prompt(&prompt)?;
-    
+
     // Auto-enable raw mode if output is piped
     let raw = raw || is_piped_output();
 
@@ -139,7 +132,7 @@ pub async fn handle_run(
     raw: bool,
 ) -> Result<(), anyhow::Error> {
     let prompt = read_prompt(&prompt)?;
-    
+
     // Auto-enable raw mode if output is piped (unless JSON is requested)
     let raw = raw || (is_piped_output() && !json);
 
